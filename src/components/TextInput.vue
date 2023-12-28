@@ -1,7 +1,10 @@
 <template>
     <div class="textBox"  @keyup.enter="submitText()" >
-        <div class="icon">
-            <i class="fa-solid fa-face-smile-wink" style=""></i>
+        <span id="iconPicker"><Picker :data="emojiIndex" set="twitter" @select="addEmoji" /></span>
+        <div class="icon" @click="showIconPicker">
+            <i class="fa-solid fa-face-smile-wink icon"  ></i>
+            <!-- <emoji-mart @emoji-click="addEmoji" /> -->
+            
         </div>
         <input type="text" v-model="text" name="text" class="mainInput">
         <SubmitButton @submitText="submitText()" :text="text" />
@@ -13,18 +16,28 @@
 
 import SubmitButton from './SubmitButton.vue';
 
+import data from "emoji-mart-vue-fast/data/all.json";
+import "emoji-mart-vue-fast/css/emoji-mart.css";
+import { Picker, EmojiIndex } from "emoji-mart-vue-fast/src";
+
+
+let emojiIndex = new EmojiIndex(data);
+
 export default{
     name: 'TextInput',
     data(){
         return{
-            text: ''
+            text: '',
+            emojiIndex: emojiIndex,
+            emojisOutput: ""
         }
     },
     props:{
         noOfMessages: Number
     },
     components: {
-        SubmitButton
+        SubmitButton,
+        Picker
     },
     methods: {
         submitText(){
@@ -36,9 +49,20 @@ export default{
                     name: localStorage.getItem('name')
                 }
                 this.text = '';
+
+                let iconPicker = document.getElementById("iconPicker")
+                iconPicker.style.display = "none"
+
                 return this.$emit('submitText', newMessage);
             }
         
+        },
+        addEmoji(emoji) {
+            this.text += emoji.native
+        },
+        showIconPicker() {
+            let iconPicker = document.getElementById("iconPicker")
+            iconPicker.style.display = iconPicker.style.display == "none" ? "block" : "none"
         }
     },
     watch: {
@@ -55,11 +79,24 @@ export default{
 </script>
 
 <style>
+* {
+  margin: 0;
+  transition: all 0.5s;
+}
 
+.emoji-mart {
+  background-color: rgb(146, 204, 255); /* Set your desired background color */
+}
 
+#iconPicker {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+}
 
 .icon{
-    color: #aaa5a5; 
+    color: white; 
     cursor: pointer;
     cursor: pointer;
     border: 0px;
@@ -100,11 +137,11 @@ export default{
 .mainInput:focus{
     /* border: 2px solid lightgrey; */
     outline: none;
-    /* background: lightgrey; */
+    background: grey;
 }
 
 .icon:hover{
-    color: white;
+    color: rgb(26, 130, 220);
 }
 
 </style>
