@@ -85,13 +85,13 @@ export default {
         }
   },
   computed: {
-    //Scroll always to the bottom
-    scrollUpdate(){
-        var messageBody = document.querySelector('.allMessages');
+    // //Scroll always to the bottom
+    // scrollUpdate(){
+    //     var messageBody = document.querySelector('.allMessages');
 
-        messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
+    //     messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
 
-    }
+    // }
   },
 
 }
@@ -101,7 +101,7 @@ export default {
 
 * {
   margin: 0;
-
+  transition: all 0.5s;
 }
 
 

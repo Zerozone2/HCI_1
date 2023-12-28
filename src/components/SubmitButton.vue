@@ -37,12 +37,12 @@ export default{
 }
 
 .sendButton{
-    color: #aaa5a5;
+    color:  white;
     transform: translate(-100%, 0%);
 }
 
 .sendButton:hover{
-    color: white;
+    color: rgb(26, 130, 220);
 }
 
 </style>
