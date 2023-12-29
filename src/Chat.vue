@@ -14,6 +14,9 @@
 
   </div>
   
+  <div class="voiceChatCanvas" v-show="this.voiceChatSwitch">
+
+  </div>
 
 <div id="channelsLayout">
 
@@ -60,19 +63,18 @@ export default {
   data() {
     return{
       messages: [],
-      channels: ["1st channel"],
+      channels: [],
       textChatSwitch: false,
       voiceChatSwitch: false,
-      currentChannel: "1st channel",
+      currentChannel: "",
       newChannel: "",
       privateChat: ""
     }
   },
   async created(){
     this.fetchData()
-    setInterval(() => this.fetchData(), 5000)
+    // setInterval(() => this.fetchData(), 5000)
     this.channels = await this.fetchChannels()
-    // setInterval(async () => this.channels = await this.fetchChannels(), 10000)
   },
   methods:{
     // Create and channel and send it to Firebase
@@ -104,26 +106,44 @@ export default {
     // Sending new messages to Database
     async submitText(newMessage){
 
-      // const newMess =  await fetch(`https://studiando-a6bec-default-rtdb.firebaseio.com/chats/${this.currentChannel}.json`, {
-      const newMess =  await fetch(`https://textchat-159f4-default-rtdb.firebaseio.com/chats/channels/${this.currentChannel}.json`, {
-            method: "post",
-            referrer: this.messages.length,
-            headers: {
-              'Content-type': "application/json; charset=UTF-8"
-            },
-            body: [JSON.stringify(newMessage)],
+      if( this.privateChat ) {  
+        // const newMess =  await fetch(`https://studiando-a6bec-default-rtdb.firebaseio.com/chats/${this.currentChannel}.json`, {
+        const newMess =  await fetch(`https://textchat-159f4-default-rtdb.firebaseio.com/chats/private/${this.privateChat}.json`, {
+              method: "post",
+              referrer: this.messages.length,
+              headers: {
+                'Content-type': "application/json; charset=UTF-8"
+              },
+              body: JSON.stringify(newMessage),
 
-        })
-        console.log(this.currentChannel)
+          })
+      } else {  
+        // const newMess =  await fetch(`https://studiando-a6bec-default-rtdb.firebaseio.com/chats/${this.currentChannel}.json`, {
+        const newMess =  await fetch(`https://textchat-159f4-default-rtdb.firebaseio.com/chats/channels/${this.currentChannel}.json`, {
+              method: "post",
+              referrer: this.messages.length,
+              headers: {
+                'Content-type': "application/json; charset=UTF-8"
+              },
+              body: [JSON.stringify(newMessage)],
+
+          })
+      }
       this.messages = [ ...this.messages,  newMessage]
-      
     },
     // Getting Messages from firebase Database
     async fetchData(){
-      // const jsonFile = await fetch(`https://studiando-a6bec-default-rtdb.firebaseio.com/chats/${this.currentChannel}.json`)
-      const jsonFile = await fetch(`https://textchat-159f4-default-rtdb.firebaseio.com/chats/channels/${this.currentChannel}.json`)
-      let chat = await jsonFile.json();
-      
+      let chat;
+      if( this.privateChat ) {  
+        // const newMess =  await fetch(`https://studiando-a6bec-default-rtdb.firebaseio.com/chats/${this.currentChannel}.json`, {
+        const jsonFile =  await fetch(`https://textchat-159f4-default-rtdb.firebaseio.com/chats/private/${this.privateChat}.json`)
+        chat = await jsonFile.json();
+      } else {  
+        // const newMess =  await fetch(`https://studiando-a6bec-default-rtdb.firebaseio.com/chats/${this.currentChannel}.json`, {
+        const jsonFile =  await fetch(`https://textchat-159f4-default-rtdb.firebaseio.com/chats/channels/${this.currentChannel}.json`)
+        chat = await jsonFile.json();
+      }
+      console.log(chat)
       let arrayChat = []
 
       for( let message in chat )
@@ -131,6 +151,34 @@ export default {
 
       this.messages = arrayChat
       // return arrayChat
+    },
+    async fetchPrivateChats(selectedUser, onlineUser) {
+
+      // const jsonFile = await fetch(`https://studiando-a6bec-default-rtdb.firebaseio.com/chats/private.json`)
+      const jsonFile1 = await fetch(`https://textchat-159f4-default-rtdb.firebaseio.com/chats/private.json`)
+      
+      let channels = await jsonFile1.json();
+      
+      let chatName = ""
+
+      for( let name in channels )
+        if( name.includes(selectedUser) && name.includes(onlineUser) )
+          chatName = name
+
+      if( chatName ){ 
+
+        this.privateChat = chatName
+        const jsonFile2 = await fetch(`https://textchat-159f4-default-rtdb.firebaseio.com/chats/private/${chatName}.json`)      
+        this.messages = await jsonFile2.json();
+
+      } else {
+        
+        this.privateChat = `${selectedUser}_${onlineUser}`
+        // const jsonFile2 = await fetch(`https://textchat-159f4-default-rtdb.firebaseio.com/chats/private/${this.privateChat}.json`)      
+        this.messages = [];
+
+      }
+
     },
     openTextChat() {
         this.textChatSwitch = true;
@@ -148,14 +196,23 @@ export default {
         const channelDropdown = document.getElementById('channelSelection')
         const selectedChannel = channelDropdown.value;
         this.currentChannel = selectedChannel
-        console.log(this.currentChannel)
+
         this.closeChannelSelection
         clearInterval(this.fetchData)
         this.fetchData()
         setInterval(() => this.fetchData(), 5000)
     },
-    openPrivateChat() {
+    async openPrivateChat() {
 
+      let selectedUser = this.privateChat
+      let onlineUser = localStorage.getItem('name');
+
+      this.fetchPrivateChats(selectedUser, onlineUser)
+
+      this.closeChannelSelection()
+      clearInterval(this.fetchData)
+      this.fetchData()
+      setInterval(() => this.fetchData(), 5000)
     },
     closeChannelSelection() {
       const channelsLayout = document.getElementById("channelsLayout")
@@ -163,8 +220,10 @@ export default {
       this.openTextChat()
     },
     openChannelSelection() {
-      const channelsLayout = document.getElementById("channelsLayout")
-      channelsLayout.style.display = "block"
+      if( !this.textChatSwitch ) {        
+        const channelsLayout = document.getElementById("channelsLayout")
+        channelsLayout.style.display = "block"
+      }
       document.getElementById('textCh').style.backgroundColor="rgb(26, 130, 220)";
       document.getElementById('voiceCh').style.backgroundColor="rgba(98, 140, 180, 0.34)";
     },
@@ -173,7 +232,8 @@ export default {
       const channelDropdown = document.getElementById('channelSelection')
       const selectedChannel = channelDropdown.value;
       
-      if( selectedChannel != this.currentChannel ) {  
+      if( selectedChannel != this.currentChannel || this.privateChat ) {
+        this.privateChat = ""  
         const channelDropdown = document.getElementById('channelSelection')
         const selectedChannel = channelDropdown.value;
         this.currentChannel = selectedChannel

@@ -5,9 +5,9 @@ import Notifications from './Notifications.vue'
 
 localStorage.clear()
 
-// let result = prompt("Enter Username ")
+let result = prompt("Enter Username ")
 localStorage.setItem('admin', "samer")
-localStorage.setItem('name', "samer")
+localStorage.setItem('name', result)
 
 
 while( localStorage.getItem('name') === "null" || localStorage.getItem('name') === "" ){
