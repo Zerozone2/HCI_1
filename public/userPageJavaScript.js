@@ -2,6 +2,7 @@ const App = Vue.createApp({
     data(){
         return{
             chatSwitch: false,
+            notificationsSwtich: false,
             featuresSwitch: false,
             optionsSwitch: false,
             notsSwitch: false,
@@ -25,6 +26,16 @@ const App = Vue.createApp({
             else {
                 this.chatSwitch = true;
                 document.getElementById('ch1').style.backgroundColor="aqua";
+            }
+        },
+        switchNotifications(){
+            if (this.notificationsSwtich){ 
+                this.notificationsSwtich = false;
+                document.getElementById('ch2').style.backgroundColor="red";
+            }
+            else {
+                this.notificationsSwtich = true;
+                document.getElementById('ch2').style.backgroundColor="aqua";
             }
         },
         switchFeatures(){

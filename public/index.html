@@ -57,9 +57,12 @@
         <div class="channels" id="ch1" @click="switchChat">
             <h1>CS</h1>
         </div>
-        <!-- <div class="channels" id="ch2" @click="switchChat">
+        <div class="channels" id="ch2" @click="switchNotifications">
+          <div>
+            <i class="fa-solid fa-bell fa-3x" id="notificationIcon" style="color: #1b2b47;"></i>
+          </div>
         </div>
-        <div class="channels" id="ch3" @click="switchChat">
+        <!-- <div class="channels" id="ch3" @click="switchChat">
         </div> -->
         
         
@@ -73,6 +76,10 @@
     </div>
 
     <div class="chatBar" id="chat" v-show="this.chatSwitch">
+        
+    </div>
+
+    <div class="chatBar" id="notifications" v-show="this.notificationsSwtich">
         
     </div>
 

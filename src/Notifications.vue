@@ -1,19 +1,8 @@
 <template>
-  <div class="chatOptions">
-    <div class="chatOptionButton" id="textCh" @click="openTextChat">
-      <i class="fa-brands fa-rocketchat"></i>
-    </div>
-    <div class="chatOptionButton" id="voiceCh" @click="openVoiceChat">
-      <i class="fa-solid fa-microphone"></i>
-    </div>
-  </div>
-  <div class="textChatCanvas" v-show="this.textChatSwitch">
+  <div class="textChatCanvas2" v-show="this.textChatSwitch">
     <Messages :messages="messages"/>
   </div>
-  <div class="voiceChatCanvas" v-show="this.voiceChatSwitch">
-    
-  </div>
-    <TextInput @submitText="submitText" :noOfMessages="messages.length" />
+    <TextInput @submitText="submitText" :noOfMessages="messages.length" v-show="adminOnline" />
   
 </template>
 
@@ -23,7 +12,7 @@ import TextInput from './components/TextInput.vue'
 import Messages from './components/Messages.vue'
 
 export default {
-  name: 'Chat',
+  name: 'Notifications',
   components: {
     TextInput,
     Messages
@@ -33,6 +22,7 @@ export default {
       messages: [],
       textChatSwitch: true,
       voiceChatSwitch: false,
+      adminOnline: localStorage.getItem('name') === localStorage.getItem('admin')
     }
   },
   async created(){
@@ -47,7 +37,7 @@ export default {
     // Sending new messages to Database
     async submitText(newMessage){
 
-      const newMess =  fetch("https://studiando-a6bec-default-rtdb.firebaseio.com/chats/mainChannel.json", {
+      const newMess =  fetch("https://studiando-a6bec-default-rtdb.firebaseio.com/chats/notifications.json", {
             method: "post",
             referrer: this.messages.length,
             headers: {
@@ -61,7 +51,7 @@ export default {
     },
     // Getting Messages from firebase Database
     async fetchData(){
-      const jsonFile = await fetch('https://studiando-a6bec-default-rtdb.firebaseio.com/chats/mainChannel.json')
+      const jsonFile = await fetch('https://studiando-a6bec-default-rtdb.firebaseio.com/chats/notifications.json')
       let chat = await jsonFile.json();
       
       let arrayChat = []
@@ -71,12 +61,6 @@ export default {
 
       return arrayChat
     },
-    openTextChat(){
-            this.textChatSwitch = true;
-            this.voiceChatSwitch = false;
-            document.getElementById('textCh').style.backgroundColor="rgb(26, 130, 220)";
-            document.getElementById('voiceCh').style.backgroundColor="rgba(98, 140, 180, 0.34)";
-        },
   },
   computed: {
     // //Scroll always to the bottom
@@ -99,11 +83,11 @@ export default {
 }
 
 
-#chat {
+#notifications {
   position: absolute;
   top: 0;
   /* left: 5%; */
-  height: 98vh;
+  height: 100vh;
   width: 25vw;
   border: 1px solid rgb(92, 90, 90);
   box-shadow: 0px 0px 10px rgba(130, 129, 129, 0.582);
@@ -127,15 +111,11 @@ export default {
 #textCh{
   background-color: rgb(26, 130, 220);
 }
-.textChatCanvas{
-  height: 96%;
+.textChatCanvas2{
+  height: 103%;
   margin: 0%;
 }
 
-.voiceChatCanvas{
-  height: 96%;
-  margin: 0%;
-}
 .chatOptionButton{
   color: rgb(255, 255, 255);
   margin: 2%;

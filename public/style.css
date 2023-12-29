@@ -60,12 +60,23 @@ body {
     font-size: small;
 }
 
+#notificationIcon {
+    color: #1b2b47;
+}
+
+#ch2 {
+    background: red;
+}
+
 .channels h1{
     transform: translate(0%, 30%);
     background-color: transparent;
 }
 
-
+.channels div{
+    transform: translate(0%, 30%);
+    background-color: transparent;
+}
 
 .optionsButton{
     display: flex;
