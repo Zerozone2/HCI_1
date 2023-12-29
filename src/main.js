@@ -20,3 +20,10 @@ while( localStorage.getItem('name') === "null" || localStorage.getItem('name') =
 createApp(Chat).mount('#chat');
 createApp(Notifications).mount('#notifications');
 createApp(Library).mount('#library');
+
+// document.addEventListener('click', function(e) {
+    
+//     const channelsLayout = document.getElementById("channelsLayout")
+//     channelsLayout.style.display = "none"
+
+// })

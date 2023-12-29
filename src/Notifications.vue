@@ -26,18 +26,15 @@ export default {
     }
   },
   async created(){
-    this.messages = await this.fetchData()
-  },
-  watch: {
-    async messages(){
-      this.messages = await this.fetchData()
-    }
+    // this.messages = await this.fetchData()
+    // setInterval(async () => this.messages = await this.fetchData(), 5000)
   },
   methods:{
     // Sending new messages to Database
     async submitText(newMessage){
 
-      const newMess =  fetch("https://studiando-a6bec-default-rtdb.firebaseio.com/chats/notifications.json", {
+      // const newMess =  fetch("https://studiando-a6bec-default-rtdb.firebaseio.com/chats/notifications.json", {
+      const newMess =  fetch("https://textchat-159f4-default-rtdb.firebaseio.com/chats/notifications.json", {
             method: "post",
             referrer: this.messages.length,
             headers: {
@@ -51,11 +48,13 @@ export default {
     },
     // Getting Messages from firebase Database
     async fetchData(){
-      const jsonFile = await fetch('https://studiando-a6bec-default-rtdb.firebaseio.com/chats/notifications.json')
+      // const jsonFile = await fetch('https://studiando-a6bec-default-rtdb.firebaseio.com/chats/notifications.json')
+      // const jsonFile = await fetch('https://textchat-159f4-default-rtdb.firebaseio.com/chats/notifications.json')
+      const jsonFile = await fetch('https://textchat-159f4-default-rtdb.firebaseio.com/chats/notifications.json')
       let chat = await jsonFile.json();
       
       let arrayChat = []
-
+      // console.log(chat)
       for( let message in chat )
         arrayChat[chat[message]['index']-1] = chat[message]
 

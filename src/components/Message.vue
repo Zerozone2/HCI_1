@@ -1,9 +1,9 @@
 <template>
-    <div :class="[ getNameFromLocal() !== mess.name ? 'message' : 'userMessage' ]">
+    <div :class="[ getNameFromLocal !== mess.name ? 'message' : 'userMessage' ]">
     <!-- <div class="userMessage"> -->
         <p>{{ mess.message }}</p>
         <br>
-        <p class="personName">{{ mess.name }}</p>
+        <!-- <p class="personName">{{ mess.date }} {{ mess.name }}</p> -->
         
     </div>
 </template>
@@ -17,11 +17,11 @@ export default{
     props: {
         mess: Object,
     },
-    methods: {
+    computed: {
         getNameFromLocal(){
             return localStorage.getItem('name');
         }
-    }
+    },
 }
 
 </script>
@@ -54,7 +54,7 @@ export default{
 }
 
 .personName{
-    font-size: 8px;
+    font-size: 10px;
     text-align: right;
 }
 
