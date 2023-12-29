@@ -7,13 +7,23 @@
       <i class="fa-solid fa-microphone"></i>
     </div>
   </div>
-  <div class="textChatCanvas" v-show="this.textChatSwitch">
-    <Messages :messages="messages"/>
+  <div>
+
+    <div id="channelSelectionLayout">
+      <label for="channelSelection">Channels</label>
+      <br>
+      <select name="" id="channelSelection" >
+        <option @change="changeChannel" :value="channel" v-for="(channel,index) in channels" :key="index">{{ channel }}</option>
+      </select>
+    </div>
+    <div id="newChannelLayout">      
+      <label for="channelTextInput">New Channel Name</label>
+      <br>
+      <input type="text" v-model="newChannel" id="channelTextInput">
+      <button @click="createChannel">Create Channel</button>
+    </div>
   </div>
-  <div class="voiceChatCanvas" v-show="this.voiceChatSwitch">
-    
-  </div>
-    <TextInput @submitText="submitText" :noOfMessages="messages.length" />
+    <!-- <TextInput @submitText="submitText" :noOfMessages="messages.length" /> -->
   
 </template>
 
@@ -31,23 +41,52 @@ export default {
   data() {
     return{
       messages: [],
+      channels: [],
       textChatSwitch: true,
       voiceChatSwitch: false,
+      currentChannel: "Main Channel",
+      newChannel: ""
     }
   },
   async created(){
-    this.messages = await this.fetchData()
+    // this.messages = await this.fetchData(),
+    // this.channels = await this.fetchChannels()
   },
   watch: {
     async messages(){
       this.messages = await this.fetchData()
+    },
+    async channels() {
+      this.channels = await this.fetchChannels()
     }
   },
   methods:{
+    // Create and channel and send it to Firebase
+    async createChannel(){
+
+      this.channels = [ ...this.channels,  this.newChannel]
+
+      this.newChannel
+
+    },
+    // Getting channels from firebase
+    async fetchChannels() {
+      
+      const jsonFile = await fetch(`https://studiando-a6bec-default-rtdb.firebaseio.com/chats.json`)
+      
+      let channels = await jsonFile.json();
+      
+      let channelNames = []
+
+      for( let name in chat )
+        channelNames[ channelNames.length ] = name
+
+      return channelNames
+    },
     // Sending new messages to Database
     async submitText(newMessage){
 
-      const newMess =  fetch("https://studiando-a6bec-default-rtdb.firebaseio.com/chats/mainChannel.json", {
+      const newMess =  await fetch(`https://studiando-a6bec-default-rtdb.firebaseio.com/chats/${this.currentChannel}.json`, {
             method: "post",
             referrer: this.messages.length,
             headers: {
@@ -61,7 +100,7 @@ export default {
     },
     // Getting Messages from firebase Database
     async fetchData(){
-      const jsonFile = await fetch('https://studiando-a6bec-default-rtdb.firebaseio.com/chats/mainChannel.json')
+      const jsonFile = await fetch(`https://studiando-a6bec-default-rtdb.firebaseio.com/chats/${this.currentChannel}.json`)
       let chat = await jsonFile.json();
       
       let arrayChat = []
@@ -71,12 +110,23 @@ export default {
 
       return arrayChat
     },
-    openTextChat(){
-            this.textChatSwitch = true;
-            this.voiceChatSwitch = false;
-            document.getElementById('textCh').style.backgroundColor="rgb(26, 130, 220)";
-            document.getElementById('voiceCh').style.backgroundColor="rgba(98, 140, 180, 0.34)";
-        },
+    openTextChat() {
+        this.textChatSwitch = true;
+        this.voiceChatSwitch = false;
+        document.getElementById('textCh').style.backgroundColor="rgb(26, 130, 220)";
+        document.getElementById('voiceCh').style.backgroundColor="rgba(98, 140, 180, 0.34)";
+    },
+    openVoiceChat() {
+        this.textChatSwitch = false;
+        this.voiceChatSwitch = true;
+        document.getElementById('textCh').style.backgroundColor="rgba(98, 140, 180, 0.34)";
+        document.getElementById('voiceCh').style.backgroundColor="rgb(26, 130, 220)";
+    },
+    changeChannel() {
+        const channelDropdown = document.getElementById('channelSelection')
+        const selectedChannel = channelDropdown.value;
+        this.currentChannel = selectedChannel
+    }
   },
   computed: {
     // //Scroll always to the bottom
@@ -98,6 +148,23 @@ export default {
   transition: all 0.5s;
 }
 
+#channelSelection {
+  max-width: 150px;
+  min-width: 100px;
+}
+
+#newChannelLayout{
+  margin: 10% 0;
+}
+
+#channelSelectionLayout *{
+  margin: 2% 0;
+}
+
+
+#newChannelLayout *{
+  margin: 2% 0;
+}
 
 #chat {
   position: absolute;
