@@ -31,7 +31,7 @@ const App = Vue.createApp({
         switchNotifications(){
             if (this.notificationsSwtich){ 
                 this.notificationsSwtich = false;
-                document.getElementById('ch2').style.backgroundColor="red";
+                document.getElementById('ch2').style.backgroundColor="aliceblue";
             }
             else {
                 this.notificationsSwtich = true;
