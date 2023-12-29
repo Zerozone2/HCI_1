@@ -64,6 +64,10 @@ body {
     color: #1b2b47;
 }
 
+#ch2 {
+    background: red;
+}
+
 .channels h1{
     transform: translate(0%, 30%);
     background-color: transparent;
