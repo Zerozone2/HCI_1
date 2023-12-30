@@ -22,12 +22,13 @@ export default {
       messages: [],
       textChatSwitch: true,
       voiceChatSwitch: false,
-      adminOnline: localStorage.getItem('name') === localStorage.getItem('admin')
+      adminOnline: localStorage.getItem('email') === localStorage.getItem('admin'),
+      refresh: 10000
     }
   },
   async created(){
-    // this.messages = await this.fetchData()
-    // setInterval(async () => this.messages = await this.fetchData(), 5000)
+    this.messages = await this.fetchData()
+    setInterval(async () => this.messages = await this.fetchData(), this.refresh)
   },
   methods:{
     // Sending new messages to Database
@@ -49,7 +50,6 @@ export default {
     // Getting Messages from firebase Database
     async fetchData(){
       // const jsonFile = await fetch('https://studiando-a6bec-default-rtdb.firebaseio.com/chats/notifications.json')
-      // const jsonFile = await fetch('https://textchat-159f4-default-rtdb.firebaseio.com/chats/notifications.json')
       const jsonFile = await fetch('https://textchat-159f4-default-rtdb.firebaseio.com/chats/notifications.json')
       let chat = await jsonFile.json();
       
@@ -62,13 +62,13 @@ export default {
     },
   },
   computed: {
-    // //Scroll always to the bottom
-    // scrollUpdate(){
-    //     var messageBody = document.querySelector('.allMessages');
+    //Scroll always to the bottom
+    scrollUpdate(){
+        var messageBody = document.querySelector('.allMessages');
 
-    //     messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
+        messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
 
-    // }
+    }
   },
 
 }

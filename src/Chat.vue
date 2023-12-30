@@ -10,7 +10,6 @@
 
   <div class="textChatCanvas" v-show="this.textChatSwitch">
     <Messages :messages="messages"/>
-    <TextInput @submitText="submitText" :noOfMessages="messages.length" />
 
   </div>
   
@@ -46,7 +45,8 @@
     </div>
   </div>
 
-  
+  <TextInput @submitText="submitText" :noOfMessages="messages.length" v-show="this.textChatSwitch"/>
+
 </template>
 
 <script>
@@ -68,13 +68,15 @@ export default {
       voiceChatSwitch: false,
       currentChannel: "",
       newChannel: "",
-      privateChat: ""
+      privateChat: "",
+      refresh: 5000
     }
   },
   async created(){
     this.fetchData()
-    // setInterval(() => this.fetchData(), 5000)
+    setInterval(() => this.fetchData(), this.refresh)
     this.channels = await this.fetchChannels()
+    setInterval(async () => this.channels = await this.fetchChannels(), 2*this.refresh)
   },
   methods:{
     // Create and channel and send it to Firebase
@@ -99,7 +101,6 @@ export default {
       let channelNames = []
       for( let name in channels )
         channelNames[ channelNames.length ] = name
-        console.log(channelNames)
 
       return channelNames
     },
@@ -143,14 +144,13 @@ export default {
         const jsonFile =  await fetch(`https://textchat-159f4-default-rtdb.firebaseio.com/chats/channels/${this.currentChannel}.json`)
         chat = await jsonFile.json();
       }
-      console.log(chat)
+
       let arrayChat = []
 
       for( let message in chat )
         arrayChat[chat[message]['index']-1] = chat[message]
 
       this.messages = arrayChat
-      // return arrayChat
     },
     async fetchPrivateChats(selectedUser, onlineUser) {
 
@@ -162,9 +162,10 @@ export default {
       let chatName = ""
 
       for( let name in channels )
-        if( name.includes(selectedUser) && name.includes(onlineUser) )
+        if( this.isSubstringAppearingOnce(name,selectedUser) && this.isSubstringAppearingOnce(name,onlineUser) )
           chatName = name
-
+      console.log(selectedUser)
+      console.log(onlineUser)
       if( chatName ){ 
 
         this.privateChat = chatName
@@ -174,11 +175,20 @@ export default {
       } else {
         
         this.privateChat = `${selectedUser}_${onlineUser}`
-        // const jsonFile2 = await fetch(`https://textchat-159f4-default-rtdb.firebaseio.com/chats/private/${this.privateChat}.json`)      
         this.messages = [];
 
       }
 
+    },
+    isSubstringAppearingOnce(mainString, subString) {
+
+        if(mainString === subString)
+          return false
+
+        const firstIndex = mainString.indexOf(subString);
+        const lastIndex = mainString.lastIndexOf(subString);
+
+        return firstIndex !== -1 && firstIndex === lastIndex;
     },
     openTextChat() {
         this.textChatSwitch = true;
@@ -187,6 +197,7 @@ export default {
     openVoiceChat() {
         this.textChatSwitch = false;
         this.voiceChatSwitch = true;
+        this.privateChat = ""
         document.getElementById('textCh').style.backgroundColor="rgba(98, 140, 180, 0.34)";
         document.getElementById('voiceCh').style.backgroundColor="rgb(26, 130, 220)";
         const channelsLayout = document.getElementById("channelsLayout")
@@ -200,19 +211,25 @@ export default {
         this.closeChannelSelection
         clearInterval(this.fetchData)
         this.fetchData()
-        setInterval(() => this.fetchData(), 5000)
+        setInterval(() => this.fetchData(), this.refresh)
     },
     async openPrivateChat() {
 
       let selectedUser = this.privateChat
-      let onlineUser = localStorage.getItem('name');
+      let onlineUser = localStorage.getItem('email');
+      
+      if(selectedUser === onlineUser) {
+        alert("Can not make chat with yourself")
+        this.privateChat = ""
+        return
+      }
 
       this.fetchPrivateChats(selectedUser, onlineUser)
 
       this.closeChannelSelection()
       clearInterval(this.fetchData)
       this.fetchData()
-      setInterval(() => this.fetchData(), 5000)
+      setInterval(() => this.fetchData(), this.refresh)
     },
     closeChannelSelection() {
       const channelsLayout = document.getElementById("channelsLayout")
@@ -242,13 +259,13 @@ export default {
     }
   },
   computed: {
-    // //Scroll always to the bottom
-    // scrollUpdate(){
-    //     var messageBody = document.querySelector('.allMessages');
+    //Scroll always to the bottom
+    scrollUpdate(){
+        var messageBody = document.getElementsByClassName('allMessages');
 
-    //     messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
+        messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
 
-    // }
+    }
   },
 
 }
@@ -268,7 +285,7 @@ export default {
 
 #channelsLayout {
   position: absolute;
-  top: 0;
+  top: 10%;
   left: 50%;
   transform: translateX(-50%);
 }
@@ -312,7 +329,7 @@ export default {
   background-color: rgb(26, 130, 220);
 }
 .textChatCanvas{
-  height: 114%;
+  height: 96%;
   margin: 0%;
 }
 

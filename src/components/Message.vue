@@ -3,7 +3,7 @@
     <!-- <div class="userMessage"> -->
         <p>{{ mess.message }}</p>
         <br>
-        <!-- <p class="personName">{{ mess.date }} {{ mess.name }}</p> -->
+        <p class="personName">{{ mess.date }}     <br>  {{ mess.name }}</p>
         
     </div>
 </template>
@@ -19,7 +19,7 @@ export default{
     },
     computed: {
         getNameFromLocal(){
-            return localStorage.getItem('name');
+            return localStorage.getItem('userName');
         }
     },
 }

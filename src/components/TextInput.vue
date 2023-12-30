@@ -1,5 +1,5 @@
 <template>
-    <div class="textBox"  @keyup.enter="submitText()" >
+    <div class="textBox"  @keyup.enter="submitText()"  v>
         <span id="iconPicker"><Picker :data="emojiIndex" set="twitter" @select="addEmoji" /></span>
         <div class="icon" @click="showIconPicker">
             <i class="fa-solid fa-face-smile-wink icon"  ></i>
@@ -15,6 +15,7 @@
 <script>
 
 import SubmitButton from './SubmitButton.vue';
+
 
 import data from "emoji-mart-vue-fast/data/all.json";
 import "emoji-mart-vue-fast/css/emoji-mart.css";
@@ -42,11 +43,15 @@ export default{
     methods: {
         submitText(){
 
+            let d = new Date()
+            d = `${d.getHours()}:${d.getMinutes()} ${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`
+
             if(this.text !== ''){
                 const newMessage = {
                     index: this.noOfMessages+1,
                     message: this.text,
-                    name: localStorage.getItem('name')
+                    name: localStorage.getItem('userName'),
+                    date: d
                 }
                 this.text = '';
 
@@ -67,7 +72,7 @@ export default{
     },
     watch: {
         noOfMessages(){  
-                    
+            console.log(this.noOfMessages)
             var messageBody = document.querySelector('.allMessages');
             messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
 
